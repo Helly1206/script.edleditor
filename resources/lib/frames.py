@@ -6,6 +6,10 @@
 #########################################################
 
 ####################### IMPORTS #########################
+from __future__ import division
+from __future__ import print_function
+from builtins import str
+from past.utils import old_div
 from avconv import avconv
 from tempfile import gettempdir
 from time import strftime
@@ -69,9 +73,9 @@ class frames(avconv):
 
     def get_frame_time(self, target_sec, genimage=True, image="", keepimage=False):
         if self.debug:
-            target_pts = int(target_sec / self.time_base) + self.container.start_time
+            target_pts = int(old_div(target_sec, self.time_base)) + self.container.start_time
             target_frame = self._time_to_frame(target_sec)
-            print "Target sec:", target_sec, ", Target pts:", target_pts, ", target frame:", target_frame
+            print("Target sec:", target_sec, ", Target pts:", target_pts, ", target frame:", target_frame)
         if genimage or image:
             image=self._generateimage(image, keepimage)
             if self._seek_frame(target_sec, image):
@@ -84,7 +88,7 @@ class frames(avconv):
         target_sec = self._frame_to_time(target_frame)
         if self.debug:
             target_pts = self._frame_to_pts(target_frame)
-            print "Target sec:", target_sec, ", Target pts:", target_pts, ", target frame:", target_frame
+            print("Target sec:", target_sec, ", Target pts:", target_pts, ", target frame:", target_frame)
         if genimage or image:
             image=self._generateimage(image, keepimage)
             if self._seek_frame(target_sec, image):
@@ -119,7 +123,7 @@ class frames(avconv):
 
     def get_time_info(self):
         if self.available():
-            keyframeinterval = self.gop / self.frame_rate
+            keyframeinterval = old_div(self.gop, self.frame_rate)
             return (self.container.start_time, self.container.duration, keyframeinterval)
         else:
             return (0, -1, 0)
@@ -156,12 +160,12 @@ class frames(avconv):
             self.current_sec = frame.time
             self.current_frame = self._pts_to_frame(frame.pts)
             if self.debug:
-                print "time:", self.current_sec
+                print("time:", self.current_sec)
                 #print "time_base:", frame.time_base
                 #print "index:", frame.index
-                print "pts:", frame.pts
-                print "dts:", frame.dts
-                print "frame:", self.current_frame
+                print("pts:", frame.pts)
+                print("dts:", frame.dts)
+                print("frame:", self.current_frame)
         return frame
 
     def _generateimage(self, image = "", keepimage = False, pre = "tempframe_", ext = ".png"):
@@ -205,21 +209,21 @@ class frames(avconv):
         return
 
     def _print_info(self):
-        print "==============="
-        print "Duration:", self.container.duration
-        print "Start time:", self.container.start_time
-        print "Stream_Rate:", float(self.video_stream.rate)
-        print "Time_base:", self.time_base
-        print "GOP size:", self.gop
-        print "Frame rate:", self.frame_rate
-        print "Frame count:", self.frame_count
-        print "==============="
+        print("===============")
+        print("Duration:", self.container.duration)
+        print("Start time:", self.container.start_time)
+        print("Stream_Rate:", float(self.video_stream.rate))
+        print("Time_base:", self.time_base)
+        print("GOP size:", self.gop)
+        print("Frame rate:", self.frame_rate)
+        print("Frame count:", self.frame_count)
+        print("===============")
 
     def _time_to_frame(self, ftime):
         return int((ftime-self.container.start_time) * self.frame_rate)
 
     def _frame_to_time(self, frame):
-        return float(frame/self.frame_rate) + self.container.start_time
+        return float(old_div(frame,self.frame_rate)) + self.container.start_time
 
     def _pts_to_frame(self, pts):
         return int(pts * self.time_base * self.frame_rate) - int(self.container.start_time * self.time_base * self.frame_rate)
@@ -229,8 +233,8 @@ class frames(avconv):
 
     def _frame_to_pts(self, frame):
         if self.container:
-            target_sec = frame / self.frame_rate
-            return int(target_sec / self.time_base) + self.container.start_time
+            target_sec = old_div(frame, self.frame_rate)
+            return int(old_div(target_sec, self.time_base)) + self.container.start_time
         else:
             return 0
 

@@ -81,6 +81,10 @@ msgctxt "#60013"
 msgid "Use 1 second search delay (faster search, slower frame update)"
 msgstr ""
 
+msgctxt "#60014"
+msgid "Dialog look & feel"
+msgstr ""
+
 msgctxt "#60020"
 msgid "Disabled EDL file: %s"
 msgstr ""
