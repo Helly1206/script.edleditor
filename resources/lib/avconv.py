@@ -6,10 +6,6 @@
 #########################################################
 
 ####################### IMPORTS #########################
-from __future__ import print_function
-from builtins import next
-from builtins import str
-from builtins import object
 import subprocess
 import re
 import os

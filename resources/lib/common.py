@@ -6,8 +6,6 @@
 #########################################################
 
 ####################### IMPORTS #########################
-from builtins import str
-from builtins import object
 import os, subprocess
 import xbmc, xbmcaddon, xbmcgui
 from threading import Timer

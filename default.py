@@ -6,10 +6,6 @@
 #########################################################
 
 ####################### IMPORTS #########################
-from __future__ import division
-from builtins import str
-from builtins import object
-from past.utils import old_div
 import sys, os
 import xbmc, xbmcaddon, xbmcgui
 #########################################################
@@ -136,7 +132,7 @@ class EDLEditor(object):
         Progress=common.GUI_Progress(__LS__(60000), __LS__(60023))
         items = len(EDLlist)
         for index, item in enumerate(EDLlist):
-            Progress.update(old_div(100*index,items))
+            Progress.update(100*index//items)
             FrameInfo=self.AddFrameInfo(Frames, item, framebased)
             if Progress.iscanceled():
                 del self.framelist
@@ -273,28 +269,28 @@ class EDLEditor(object):
             framerate = Frames.get_frame_rate()
             if self.status[__LS__(60113)] == False: # Time based    
                 if len(self.framelist) > ListIndex:
-                    rawcut=self.framelist[ListIndex]['IndexStop'] + old_div((self.framelist[ListIndex+1]['IndexStart'] - self.framelist[ListIndex]['IndexStop']),2)
+                    rawcut=self.framelist[ListIndex]['IndexStop'] + (self.framelist[ListIndex+1]['IndexStart'] - self.framelist[ListIndex]['IndexStop'])//2
                 elif self.status[__LS__(60116)] >= 0:
-                    rawcut=self.framelist[ListIndex]['IndexStop'] + old_div((self.status[__LS__(60116)] - self.framelist[ListIndex]['IndexStop']),2)
+                    rawcut=self.framelist[ListIndex]['IndexStop'] + (self.status[__LS__(60116)] - self.framelist[ListIndex]['IndexStop'])//2
                 else:
                     rawcut = self.framelist[ListIndex]['IndexStop']
     
                 interval=self.status[__LS__(60117)]
                 if interval <= 0:
-                    interval = old_div(12,framerate)
-                cut = round(old_div(rawcut, interval),0)*interval
+                    interval = 12//framerate
+                cut = round((rawcut/interval),0)*interval
             else: # Frame based
                 if len(self.framelist) > ListIndex:
-                    rawcut=self.framelist[ListIndex]['IndexStop'] + old_div((self.framelist[ListIndex+1]['IndexStart'] - self.framelist[ListIndex]['IndexStop']),2)
+                    rawcut=self.framelist[ListIndex]['IndexStop'] + (self.framelist[ListIndex+1]['IndexStart'] - self.framelist[ListIndex]['IndexStop'])//2
                 elif self.status[__LS__(60116)] >= 0:
-                    rawcut=self.framelist[ListIndex]['IndexStop'] + old_div((self.status[__LS__(60116)*framerate] - self.framelist[ListIndex]['IndexStop']),2)
+                    rawcut=self.framelist[ListIndex]['IndexStop'] + (self.status[__LS__(60116)*framerate] - self.framelist[ListIndex]['IndexStop'])//2
                 else:
                     rawcut = self.framelist[ListIndex]['IndexStop']
     
                 interval=self.status[__LS__(60117)]*framerate
                 if interval <= 0:
                     interval = 12
-                cut = int(round(old_div(rawcut, interval),0)*interval)
+                cut = int(round((rawcut/interval),0)*interval)
         except:
             cut = 0
         return cut
@@ -662,11 +658,11 @@ class GUIEdit(xbmcgui.WindowXMLDialog):
         else:
             gopinterval = self.status[__LS__(60117)]
             if gopinterval <= 0:
-                gopinterval = old_div(12,framerate)
+                gopinterval = 12//framerate
         if Start:
             enteredtime = common.GUI_Input(__LS__(60025),common.PrettyIndex(self.item['IndexStart'],self.status[__LS__(60113)]))
             starttime = common.Pretty2Index(enteredtime,self.status[__LS__(60113)])
-            newtime = round(old_div(starttime, gopinterval),0)*gopinterval
+            newtime = round((starttime/gopinterval),0)*gopinterval
             if framebased or self.status[__LS__(60115)] < 0:
                 if newtime < 0:
                     newtime = 0
@@ -679,7 +675,7 @@ class GUIEdit(xbmcgui.WindowXMLDialog):
         else:
             enteredtime = common.GUI_Input(__LS__(60026),common.PrettyIndex(self.item['IndexStop'],self.status[__LS__(60113)]))
             stoptime = common.Pretty2Index(enteredtime,self.status[__LS__(60113)])
-            newtime = round(old_div(stoptime, gopinterval),0)*gopinterval
+            newtime = round((stoptime/gopinterval),0)*gopinterval
             if newtime < starttime:
                 newtime = starttime
             if self.status[__LS__(60116)] >= 0:
@@ -715,14 +711,14 @@ class GUIEdit(xbmcgui.WindowXMLDialog):
                 jump = (interval * 60 * framerate)
             if Start:
                 starttime += jump
-                newtime = int(round(old_div(starttime, gopinterval),0)*gopinterval)
+                newtime = int(round((starttime/gopinterval),0)*gopinterval)
                 if newtime < 0:
                     newtime = 0
                 if newtime > stoptime:
                     newtime = stoptime
             else:
                 stoptime += jump 
-                newtime = int(round(old_div(stoptime, gopinterval),0)*gopinterval)
+                newtime = int(round((stoptime/gopinterval),0)*gopinterval)
                 if newtime < starttime:
                     newtime = starttime
                 if self.status[__LS__(60116)] >= 0:
@@ -735,7 +731,7 @@ class GUIEdit(xbmcgui.WindowXMLDialog):
         else:
             gopinterval = self.status[__LS__(60117)]
             if gopinterval <= 0:
-                gopinterval = old_div(12,framerate)
+                gopinterval = 12//framerate
             if Gop:
                 if interval > 0:
                     jump = 0 + gopinterval
@@ -745,7 +741,7 @@ class GUIEdit(xbmcgui.WindowXMLDialog):
                 jump = (interval * 60)
             if Start:
                 starttime += jump
-                newtime = round(old_div(starttime, gopinterval),0)*gopinterval
+                newtime = round((starttime/gopinterval),0)*gopinterval
                 if self.status[__LS__(60115)] >= 0:
                     if newtime < self.status[__LS__(60115)]:
                         newtime = self.status[__LS__(60115)]    
@@ -755,7 +751,7 @@ class GUIEdit(xbmcgui.WindowXMLDialog):
                     newtime = stoptime
             else:
                 stoptime += jump 
-                newtime = round(old_div(stoptime, gopinterval),0)*gopinterval
+                newtime = round((stoptime/gopinterval),0)*gopinterval
                 if newtime < starttime:
                     newtime = starttime
                 if self.status[__LS__(60116)] >=0:

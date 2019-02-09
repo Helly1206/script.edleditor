@@ -6,10 +6,6 @@
 #########################################################
 
 ####################### IMPORTS #########################
-from __future__ import division
-from __future__ import print_function
-from builtins import str
-from past.utils import old_div
 from avconv import avconv
 from tempfile import gettempdir
 from time import strftime
@@ -73,7 +69,7 @@ class frames(avconv):
 
     def get_frame_time(self, target_sec, genimage=True, image="", keepimage=False):
         if self.debug:
-            target_pts = int(old_div(target_sec, self.time_base)) + self.container.start_time
+            target_pts = int((target_sec/self.time_base)) + self.container.start_time
             target_frame = self._time_to_frame(target_sec)
             print("Target sec:", target_sec, ", Target pts:", target_pts, ", target frame:", target_frame)
         if genimage or image:
@@ -123,7 +119,7 @@ class frames(avconv):
 
     def get_time_info(self):
         if self.available():
-            keyframeinterval = old_div(self.gop, self.frame_rate)
+            keyframeinterval = self.gop//self.frame_rate
             return (self.container.start_time, self.container.duration, keyframeinterval)
         else:
             return (0, -1, 0)
@@ -223,7 +219,7 @@ class frames(avconv):
         return int((ftime-self.container.start_time) * self.frame_rate)
 
     def _frame_to_time(self, frame):
-        return float(old_div(frame,self.frame_rate)) + self.container.start_time
+        return float((frame/self.frame_rate)) + self.container.start_time
 
     def _pts_to_frame(self, pts):
         return int(pts * self.time_base * self.frame_rate) - int(self.container.start_time * self.time_base * self.frame_rate)
@@ -233,8 +229,8 @@ class frames(avconv):
 
     def _frame_to_pts(self, frame):
         if self.container:
-            target_sec = old_div(frame, self.frame_rate)
-            return int(old_div(target_sec, self.time_base)) + self.container.start_time
+            target_sec = frame//self.frame_rate
+            return int((target_sec/self.time_base)) + self.container.start_time
         else:
             return 0
 
